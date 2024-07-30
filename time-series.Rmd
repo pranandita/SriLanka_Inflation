@@ -1,0 +1,502 @@
+---
+title: "Sri Lanka Inflation 2022 - time series analysis"
+author: "Pranandita Biswas"
+#date: "03/27/2024"
+output: 
+  html_document:
+    code_folding: hide 
+---
+
+```{css, echo=FALSE}
+.scroll-200 {
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: inherit;
+}
+h1, h2, h3 {
+  text-align: center;
+}
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(dplyr)
+library(questionr)
+library(dplyr)
+library(ggpmisc)
+library(broom)
+library(tinytex)
+library(stargazer)
+library(sandwich)
+library(readr)
+library(readxl)
+library(tidyverse)
+library(plm)
+library(corrplot)
+library(Hmisc)
+library(corrplot)
+library(ggResidpanel)
+library(lubridate)
+library(cowplot)
+library(dynamac)
+library(tseries)
+library(lmtest)
+library(ARDL)
+library(ardl.nardl)
+library(vars)
+library(nardl)
+library(generalCorr)
+library(moments)
+library(stlplus)
+library(urca)
+library(forecast)
+library(TSstudio)
+library(dLagM)
+
+```
+
+
+
+```{r}
+# input data 
+data <- read_excel("tsa.xlsx")
+data$dv <- as.factor(data$dv)
+
+data$date <- ymd(data$date)
+
+
+# deseasonalize NCPI
+
+ ts1 <- ts(data$ncpi_adj, start = c(2014, 1), frequency = 12)
+ ts1_ds <- stl(ts1, s.window = 7)
+ ts_ncpi_adj_ds <- ts1 - ts1_ds$time.series[, 1]
+ ncpi_ds_vec <- as.vector(ts_ncpi_adj_ds)
+ data$ncpi_adj_ds <- ts_ncpi_adj_ds
+ 
+# deseasonalize M2
+
+ ts2 <- ts(data$m2, start = c(2014, 1), frequency = 12)
+ ts2_ds <- stl(ts1, s.window = 7)
+ ts_m2_ds <- ts2 - ts2_ds$time.series[, 1]
+ m2_ds_vec <- as.vector(ts_m2_ds)
+ data$m2_ds <- ts_m2_ds 
+
+## data transformations
+data <- data %>%
+  ## NCPI
+  mutate(log_ncpi = log(ncpi)) %>%
+  mutate(diff_ncpi = c(NA, diff(ncpi))) %>%
+  mutate(diff_log_ncpi = c(NA, diff(log_ncpi))) %>%
+  mutate(diff_2_log_ncpi = c(NA, diff(diff_log_ncpi))) %>%
+  
+  ## NCPI adjusted to 2013
+  mutate(log_ncpi_adj = log(ncpi_adj)) %>%
+  mutate(diff_ncpi_adj = c(NA, diff(ncpi_adj))) %>%
+  mutate(diff_log_ncpi_adj = c(NA, diff(log_ncpi_adj))) %>%
+  mutate(diff_2_log_ncpi_adj = c(NA, diff(diff_log_ncpi_adj))) %>%
+ 
+  
+  ## Deseasonalized NCPI adjusted 2013
+  mutate(log_ncpi_adj_ds = log(ncpi_adj_ds)) %>%
+  mutate(diff_ncpi_adj_ds = c(NA, diff(ncpi_adj_ds))) %>%
+  mutate(diff_log_ncpi_adj_ds = c(NA, diff(log_ncpi_adj_ds))) %>%
+  
+  
+  #### inflation 
+  ## inf 
+  mutate(log_inf = if_else(inf == 0, 0,(inf/abs(inf))*log(abs(inf)))) %>%
+  mutate(diff_inf = c(NA, diff(inf))) %>%
+  mutate(diff_log_inf = c(NA, diff(log_inf))) %>%
+  
+  ## inf adjusted
+   mutate(log_inf_adj = if_else(inf_adj == 0, 0,(inf_adj/abs(inf_adj))*log(abs(inf_adj)))) %>%
+  mutate(diff_inf_adj = c(NA, diff(inf_adj))) %>%
+  mutate(diff_log_inf_adj = c(NA, diff(log_inf_adj))) %>%
+  
+  ## Interest rate
+  mutate(log_i = log(i)) %>%
+  mutate(diff_i = c(NA, diff(i))) %>%
+  mutate(diff_log_i = c(NA, diff(log_i))) %>%
+  
+  ## Exchange rate
+  mutate(log_er = log(er)) %>%
+  mutate(diff_er = c(NA, diff(er))) %>%
+  mutate(diff_log_er = c(NA, diff(log_er))) %>%
+  
+  ## M2
+  mutate(log_m2 = log(m2)) %>%
+  mutate(diff_m2 = c(NA, diff(m2))) %>%
+  mutate(diff_log_m2 = c(NA, diff(log_m2))) %>%
+  
+  ## Deseasonalized M2
+  mutate(log_m2_ds = log(m2_ds)) %>%
+  mutate(diff_m2_ds = c(NA, diff(m2_ds))) %>%
+  mutate(diff_log_m2_ds = c(NA, diff(log_m2_ds))) %>%
+
+  ## wage rate
+  mutate(log_wr = log(wr)) %>%
+  mutate(diff_wr = c(NA, diff(wr))) %>%
+  mutate(diff_log_wr = c(NA, diff(log_wr))) %>%
+  
+  ## GDP
+  mutate(log_gdp = log(gdp)) %>%
+  mutate(diff_gdp = c(NA, diff(gdp))) %>%
+  mutate(diff_log_gdp = c(NA, diff(log_gdp)))
+
+
+```
+
+
+### Descriptive stats
+```{r}
+data_desc <- read_excel("tsa_desc.xlsx")
+summary(data_desc)
+
+sd(data_desc$ncpi_adj)
+sd(data_desc$m2)
+sd(data_desc$er)
+sd(data_desc$wr, na.rm = TRUE)
+sd(data_desc$gdp)
+sd(data_desc$i)
+
+
+```
+
+
+### Stationarity tests
+```{r}
+# Time series variables
+# full series
+
+
+## NCPI
+
+temp <- data[1:108, "ncpi"] 
+ts_ncpi <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[1:108, "log_ncpi"]
+ts_log_ncpi <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[2:108, "diff_ncpi"]
+ts_diff_ncpi <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:108, "diff_log_ncpi"]
+ts_diff_log_ncpi <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[3:108, "diff_2_log_ncpi"]
+ts_diff_2_log_ncpi <- ts(temp, start = c(2014, 3), frequency = 12)
+
+
+## NCPI adjusted to 2013
+
+temp <- data[1:120, "ncpi_adj"] 
+ts_ncpi_adj <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[1:120, "log_ncpi_adj"]
+ts_log_ncpi_adj <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[2:120, "diff_ncpi_adj"]
+ts_diff_ncpi_adj <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:108, "diff_log_ncpi_adj"]
+ts_diff_log_ncpi_adj <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[3:108, "diff_2_log_ncpi_adj"]
+ts_diff_2_log_ncpi_adj <- ts(temp, start = c(2014, 3), frequency = 12)
+
+
+## Deseasonalized NCPI adjusted 2013
+
+temp <- data[1:120, "ncpi_adj_ds"]
+ts_ncpi_adj_ds <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[1:120, "log_ncpi_adj_ds"]
+ts_log_ncpi_adj_ds <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[2:120, "diff_ncpi_adj_ds"]
+ts_diff_ncpi_adj_ds <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:108, "diff_log_ncpi_adj_ds"]
+ts_diff_log_ncpi_adj_ds <- ts(temp, start = c(2014, 2), frequency = 12)
+
+## inflation
+temp <- data[2:108, "inf"] 
+ts_inf <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:108, "log_inf"]
+ts_log_inf <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[3:108, "diff_inf"]
+ts_diff_inf <- ts(temp, start = c(2014, 3), frequency = 12)
+
+temp <- data[3:108, "diff_log_inf"]
+ts_diff_log_inf <- ts(temp, start = c(2014, 3), frequency = 12)
+
+## inflation adjusted to 2013
+temp <- data[2:120, "inf_adj"] 
+ts_inf_adj <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:120, "log_inf_adj"]
+ts_log_inf_adj <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[3:120, "diff_inf_adj"]
+ts_diff_inf_adj <- ts(temp, start = c(2014, 3), frequency = 12)
+
+temp <- data[3:120, "diff_log_inf_adj"]
+ts_diff_log_inf_adj <- ts(temp, start = c(2014, 3), frequency = 12)
+
+
+## interest rate
+
+temp <- data[1:120, "i"] 
+ts_i <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[1:120, "log_i"]
+ts_log_i <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[2:120, "diff_i"]
+ts_diff_i <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:120, "diff_log_i"]
+ts_diff_log_i <- ts(temp, start = c(2014, 2), frequency = 12)
+
+
+## exchange rate
+
+temp <- data[1:120, "er"] 
+ts_er <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[1:120, "log_er"]
+ts_log_er <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[2:120, "diff_er"]
+ts_diff_er <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:120, "diff_log_er"]
+ts_diff_log_er <- ts(temp, start = c(2014, 2), frequency = 12)
+
+
+## M2
+
+temp <- data[1:120, "m2"] 
+ts_m2 <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[1:120, "log_m2"]
+ts_log_m2 <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[2:120, "diff_m2"]
+ts_diff_m2 <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:120, "diff_log_m2"]
+ts_diff_log_m2 <- ts(temp, start = c(2014, 2), frequency = 12)
+
+## Deseasonalized M2
+
+temp <- data[1:120, "m2_ds"]
+ts_m2_ds <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[1:120, "log_m2_ds"]
+ts_log_m2_ds <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[2:120, "diff_m2_ds"]
+ts_diff_m2_ds <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:108, "diff_log_m2_ds"]
+ts_diff_log_m2_ds <- ts(temp, start = c(2014, 2), frequency = 12)
+
+
+## wage rate
+
+temp <- data[1:106, "wr"] 
+ts_wr <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[1:106, "log_wr"]
+ts_log_wr <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[2:106, "diff_wr"]
+ts_diff_wr <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:106, "diff_log_wr"]
+ts_diff_log_wr <- ts(temp, start = c(2014, 2), frequency = 12)
+
+## GDP
+
+temp <- data[1:120, "gdp"] 
+ts_gdp <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[1:120, "log_gdp"]
+ts_log_gdp <- ts(temp, start = c(2014, 1), frequency = 12)
+
+temp <- data[2:120, "diff_gdp"]
+ts_diff_gdp <- ts(temp, start = c(2014, 2), frequency = 12)
+
+temp <- data[2:120, "diff_log_gdp"]
+ts_diff_log_gdp <- ts(temp, start = c(2014, 2), frequency = 12)
+
+
+####################################################################
+```
+
+
+
+
+```{r, results='asis', message=FALSE, warning=FALSE, fig.align = 'center'}
+
+# ARDL models 
+
+data_1 <- subset(data, index < 88)
+data_2 <- subset(data, index < 107)
+
+## monetarist 
+
+### M1
+M1 <- dynardl(log_ncpi_adj ~ log_m2,
+                   data = data,
+                   lags = list("log_ncpi_adj" = 1, "log_m2" = 1),
+                   diffs = c("log_m2"),
+                   ec = TRUE, simulate = FALSE
+                   )
+
+summary(M1)
+dynardl.auto.correlated(M1)
+### White test
+data$res_m1 <- c(NA, M1[["model"]][["residuals"]])
+summary(lm(res_m1^2 ~ log_m2, data = data))
+
+
+### M2
+M2 <- dynardl(diff_log_ncpi_adj ~ diff_log_m2 ,
+                   data = data,
+                   lags = list("diff_log_ncpi_adj" = 1, "diff_log_m2" = 1),
+                   #diffs = c("diff_log_m2"),
+                   ec = TRUE, simulate = FALSE
+                   )
+
+summary(M2)
+### White test
+data$res_m2 <- c(NA, NA, M2[["model"]][["residuals"]])
+summary(lm(res_m2^2 ~ diff_log_m2, data = data))
+
+### M3
+M3 <- dynardl(diff_log_ncpi_adj ~ diff_log_m2 + diff_log_gdp + diff_log_i,
+                   data = data,
+                   lags = list("diff_log_ncpi_adj" = 1, "diff_log_m2" = 1, "diff_log_gdp" = 1, "diff_log_i" = 1),
+                   diffs = c("diff_log_i"),
+                   ec = TRUE, simulate = FALSE
+                   )
+
+summary(M3)
+dynardl.auto.correlated(M3)
+### White test
+data$res_m3 <- c(NA, NA, M3[["model"]][["residuals"]])
+summary(lm(res_m3^2 ~ diff_log_m2 + diff_log_gdp + diff_log_i, data = data))
+
+### M4
+M4 <- dynardl(diff_log_ncpi_adj_ds ~ diff_log_m2_ds,
+                   data = data,
+                   lags = list("diff_log_ncpi_adj_ds" = 1, "diff_log_m2_ds" = 1),
+                  ec = TRUE, simulate = FALSE
+                   )
+
+summary(M4)
+dynardl.auto.correlated(M4)
+### White test
+data$res_m4 <- c(NA, NA, M4[["model"]][["residuals"]])
+summary(lm(res_m4^2 ~ diff_log_m2_ds, data = data))
+
+### CC1
+cc1 <- dynardl(inf_adj ~ er,
+                   data = data,
+                   lags = list("inf_adj" = 1, "er" = 1),
+                   diffs = c("er"),
+                   ec = TRUE, simulate = FALSE
+                   )
+
+summary(cc1)
+dynardl.auto.correlated(cc1)
+### White test
+data$res_cc1 <- c(NA, NA, cc1[["model"]][["residuals"]])
+summary(lm(res_cc1^2 ~ er, data = data))
+
+
+cc2 <- dynardl(log_inf_adj ~ log_er,
+                   data = data,
+                   lags = list("log_inf_adj" = 1, "log_er" = 1),
+                   diffs = c("log_er"),
+                   ec = FALSE, simulate = FALSE
+                   )
+
+summary(cc2)
+dynardl.auto.correlated(cc2)
+### White test
+data$res_cc2 <- c(NA, NA, cc2[["model"]][["residuals"]])
+summary(lm(res_cc2^2 ~ log_er, data = data))
+
+### CC3
+cc3 <- dynardl(log_inf_adj ~ log_er + log_wr,
+                   data = data_2,
+                   lags = list("log_inf_adj" = 1, "log_er" = 1, "log_wr" = 1),
+                   diffs = c("log_er", "log_wr"),
+                   ec = FALSE, simulate = FALSE
+                   )
+
+summary(cc3)
+dynardl.auto.correlated(cc3)
+### White test
+data$res_cc3 <- c(NA, NA, cc3[["model"]][["residuals"]], rep(NA, 14))
+summary(lm(res_cc3^2 ~ log_er + log_wr, data = data))
+
+
+### H1
+h1 <- dynardl(log_inf_adj ~ log_er + log_m2,
+                   data = data,
+                   lags = list("log_inf_adj" = 1, "log_er" = 1, "log_m2" = 1),
+                   diffs = c("log_er", "log_m2"),
+                   ec = FALSE, simulate = FALSE
+                   )
+
+summary(h1)
+dynardl.auto.correlated(h1)
+### White test
+data$res_h1 <- c(NA, NA, h1[["model"]][["residuals"]])
+summary(lm(res_h1^2 ~ log_er + log_m2, data = data))
+
+
+h2 <- dynardl(diff_log_inf_adj ~ diff_log_er + diff_log_m2,
+                   data = data,
+                   lags = list("diff_log_inf_adj" = 1, "diff_log_er" = 1, "diff_log_m2" = 1),
+                   diffs = c("log_er", "log_m2"),
+                   ec = FALSE, simulate = FALSE
+                   )
+
+summary(h2)
+dynardl.auto.correlated(h2)
+### White test
+data$res_h2 <- c(NA, NA, NA, h2[["model"]][["residuals"]])
+summary(lm(res_h2^2 ~ diff_log_er + diff_log_m2, data = data)) 
+
+
+### H3
+h3 <- dynardl(diff_log_inf_adj ~ diff_log_er + diff_log_m2 + diff_log_wr,
+                   data = data_2,
+                   lags = list("diff_log_inf_adj" = 1, "diff_log_er" = 1, "diff_log_m2" = 1, "diff_log_wr" = 1),
+                   diffs = c("log_er", "log_m2", "log_wr"),
+                   ec = FALSE, simulate = FALSE
+                   )
+
+summary(h3)
+dynardl.auto.correlated(h3)
+### White test
+data$res_h3 <- c(NA, NA, NA, h3[["model"]][["residuals"]], rep(NA, 14))
+summary(lm(res_h3^2 ~ diff_log_er + diff_log_m2 + diff_log_wr, data = data)) 
+
+
+### manual bp test
+data$vec <- c(NA, M1[["model"]][["residuals"]])
+summary(lm(vec^2 ~ log_m2, data = data))
+## check p value
+
+
+```
