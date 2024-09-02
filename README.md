@@ -27,6 +27,8 @@ The data are obtained from the [database](https://www.cbsl.lk/eresearch/)  of th
 Further, several the data set named *SriLanka_compiled_macro_data.xlsx* compiles several macroeoconomic and financial variables for Sri Lanka from 2018 to 2023. These were compiled from the database of the Central Bank of Sri Lanka as well as from other sources, such as the International Monetary Fund's International Reserves and Foreign Currency Liquidity and International Investment Position databases. Users are encouraged to use and expand the data set according to their needs.
 
 ## Code
-<p>The R file named 'Time_series_data.R' contains the code to conduct time-series analysis on the data set 'Time_series_anlaysis.xlsx'. </p>
+The R file named *Time_series_data.R* contains the code to conduct time-series analysis on the data set *Time_series_anlaysis.xlsx*. 
+
+### Code structure
 
 
