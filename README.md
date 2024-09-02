@@ -4,7 +4,7 @@ This project aims to disentangle the root cause of high inflation during the Sri
 
 ## Data 
 ### Time_series_data.lsx
-<p>The data set *Time_series_data.xlsx* contains relevant macroeoconomic parameters used for evaluating the time-series ARDL models. The time series ranges from January 2014 to December 2023 except where mentioned. Some data series have shorter lengths due to data unavailability. The variables are explained as follows:</p>
+The data set *Time_series_data.xlsx* contains relevant macroeoconomic parameters used for evaluating the time-series ARDL models. The time series ranges from January 2014 to December 2023 except where mentioned. Some data series have shorter lengths due to data unavailability. The variables are explained as follows:
 
 * ***ncpi_21***: National Consumer Price Index (NCPI), reported with respect to base year 2021. Obviously, this data is reported only from 2022.
 * ***ncpi_21_adj***: NCPI (base 2021) adjusted to base year 2013 using the approximation described in Appendix 2 of the [report](https://pranandita.github.io/portfolio/1_Inflation/).
@@ -24,7 +24,7 @@ The data are obtained from the [database](https://www.cbsl.lk/eresearch/)  of th
 <p>The wage index ('w') was available until only October 2022 at the time of conducting the analysis. Hence, the wage rate ('wr') is also calculated until October 2022.</p>
 
 ### SriLanka_compiled_macro_data.xlsx
-<p>Further, several the data set named *SriLanka_compiled_macro_data.xlsx* compiles several macroeoconomic and financial variables for Sri Lanka from 2018 to 2023. These were compiled from the database of the Central Bank of Sri Lanka as well as from other sources, such as the International Monetary Fund's International Reserves and Foreign Currency Liquidity and International Investment Position databases. Users are encouraged to use and expand the data set according to their needs.</p>
+Further, several the data set named *SriLanka_compiled_macro_data.xlsx* compiles several macroeoconomic and financial variables for Sri Lanka from 2018 to 2023. These were compiled from the database of the Central Bank of Sri Lanka as well as from other sources, such as the International Monetary Fund's International Reserves and Foreign Currency Liquidity and International Investment Position databases. Users are encouraged to use and expand the data set according to their needs.
 
 ## Code
 <p>The R file named 'Time_series_data.R' contains the code to conduct time-series analysis on the data set 'Time_series_anlaysis.xlsx'. </p>
