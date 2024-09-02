@@ -4,7 +4,7 @@ This project aims to disentangle the root cause of high inflation during the Sri
 
 ## Data 
 ### Time_series_data.lsx
-<p>The data set 'Time_series_data.xlsx' contains relevant macroeoconomic parameters used for evaluating the time-series ARDL models. The time series ranges from January 2014 to December 2023 except where mentioned. Some data series have shorter lengths due to data unavailability. The variables are explained as follows:</p>
+<p>The data set _Time_series_data.xlsx_ contains relevant macroeoconomic parameters used for evaluating the time-series ARDL models. The time series ranges from January 2014 to December 2023 except where mentioned. Some data series have shorter lengths due to data unavailability. The variables are explained as follows:</p>
 
 * **'ncpi_21'**: National Consumer Price Index (NCPI), reported with respect to base year 2021. Obviously, this data is reported only from 2022.
 * **'ncpi_21_adj'**: NCPI (base 2021) adjusted to base year 2013 using the approximation described in Appendix 2 of the [report](https://pranandita.github.io/portfolio/1_Inflation/).
