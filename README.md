@@ -1,6 +1,6 @@
 # Investigating the root of inflation in Sri Lanka–Money supply or exchange rate
 
-<p>This project aims to disentangle the root cause of high inflation during the Sri Lankan financial crisis of 2022. Two theoretical models are formulated—a monetarist model and a post-Keynesian model—which blame monetary expansion and exchange rate dynamics, respectively, as the proximal cause of the inflationary spiral. The proposed models are then tested using autoregressive distributed lag (ARDL) econometric methodology with macroeoconomic monetary and fiscal data. A detailed report on the project can be found [here](https://pranandita.github.io/portfolio/1_Inflation/).</p>
+This project aims to disentangle the root cause of high inflation during the Sri Lankan financial crisis of 2022. Two theoretical models are formulated—a monetarist model and a post-Keynesian model—which blame monetary expansion and exchange rate dynamics, respectively, as the proximal cause of the inflationary spiral. The proposed models are then tested using autoregressive distributed lag (ARDL) econometric methodology with macroeoconomic monetary and fiscal data. A detailed report on the project can be found [here](https://pranandita.github.io/portfolio/1_Inflation/).
 
 ## Data 
 ### Time_series_data.lsx
@@ -19,7 +19,7 @@
 * **'wr'**: Wage rate, calculated as the ratio of the wage index ('w') to the general level of prices, taken as the adjusted NCPI value ('ncpi_adj').
 * **'gdp'**: Real GDP in million LKR. Reported with respect to base year 2015.
 
-<p>The data are obtained from the [database](https://www.cbsl.lk/eresearch/)  of the Central Bank of Sri Lanka. All data are available in monthly intervals with the exception of GDP, which is reported quarterly. For the analysis, the quarterly data are triplicated for approximate monthly values. </p>
+The data are obtained from the [database](https://www.cbsl.lk/eresearch/)  of the Central Bank of Sri Lanka. All data are available in monthly intervals with the exception of GDP, which is reported quarterly. For the analysis, the quarterly data are triplicated for approximate monthly values. 
 
 <p>The wage index ('w') was available until only October 2022 at the time of conducting the analysis. Hence, the wage rate ('wr') is also calculated until October 2022.</p>
 
