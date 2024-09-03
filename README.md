@@ -37,7 +37,7 @@ It takes the following arguments.
 * `df`: The data frame.
 * `vars`: The variables in `df` to be deseasonalized, specified as a column vector. 
 
-**2. Data transformations** <b>
+**2. Data transformations** <br>
 The following transformations are performed on all the data series.
 * First difference. 
 * Log transformation.
