@@ -31,7 +31,7 @@ The R file named *Time_series_data.R* contains the code to conduct time-series a
 
 ### Code structure
 #### Data transformations
-**1. Deseasonalize NCPI** <br>
+**1. Deseasonalize data** <br>
 The function `ds_data(df, vars)` uses the loess filter for deseasonalizing data.
 It takes the following arguments. 
 * `df`: The data frame.
@@ -44,4 +44,11 @@ The following transformations are performed on all the data series.
 * First difference of log transformation.
 
 The following variables are used. 
-`transform_data(df, vars)` and `transform_data_modified_log(df, vars)`. The `transform_data_modified_log(df, vars)` function is used for data series that contain zero and negative values, for which a regular log transformation is not possible. The modified log transform takes the logarithm of the magnitude of the data point and assigns it the same sign as the data point. This is explained in Chapter 4 of the [report](https://pranandita.github.io/files/Biswas_SriLanka_Inflation.pdf).  
+`transform_data(df, vars)` and `transform_data_modified_log(df, vars)`. The `transform_data_modified_log(df, vars)` function is used for data series that contain zero and negative values, for which a regular log transformation is not possible, such as the inflation time series `inf` and `inf_adj`. The modified log transform takes the logarithm of the magnitude of the data point and assigns it the same sign as the data point. This is explained in Chapter 4 of the [report](https://pranandita.github.io/files/Biswas_SriLanka_Inflation.pdf).  <br> <br>
+
+Both functions take the following arguments. 
+* `df`: The data frame.
+* `vars`: The variables in `df` to be deseasonalized, specified as a column vector. 
+
+#### Stationarity tests
+
