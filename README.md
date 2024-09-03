@@ -17,7 +17,7 @@ The data set *Time_series_data.xlsx* contains relevant macroeoconomic parameters
 * ***er***: Real exchange rate of LKR with respect to USD.
 * ***w***: Nominal wage index in LKR with respect to base year 2012. Only the informal private sector is considered.
 * ***wr***: Wage rate, calculated as the ratio of the wage index ('w') to the general level of prices, taken as the adjusted NCPI value ('ncpi_adj').
-* **'gdp'**: Real GDP in million LKR. Reported with respect to base year 2015.
+* ***gdp***: Real GDP in million LKR. Reported with respect to base year 2015.
 
 The data are obtained from the [database](https://www.cbsl.lk/eresearch/)  of the Central Bank of Sri Lanka. All data are available in monthly intervals with the exception of GDP, which is reported quarterly. For the analysis, the quarterly data are triplicated for approximate monthly values. 
 
@@ -63,3 +63,26 @@ Next, the function `stationarity_tests(ts_object)` takes a `zoo` element as the 
 For the ADF and PP tests, the null hypothesis is that the series is non-stationary. For the KPSS test, the null hypothesis is that the series is stationary. <br>
 
 The function `stationarity_tests(ts_object)` returns a data frame containing the f-statistics of the three tests for each time series in `ts_object`. The p-values are denoted through the star notation. Further, warnings are displayed, which are important for the **edge cases**: for p > 0.1, R reports a p-value of 0.1; for p < 0.01, R reports a p-value of 0.01. To account for these edge cases, the inequality conditions are adjusted accordingly in `stationarity_tests(ts_object)`. For these cases, R provides a warning message, e.g., for p > 0.1, it reports 'p-value greater than printed p-value'. The warning messages are stored in the results and the results should be re-checked individually in these cases before final reporting.
+
+#### ARDL models
+The ARDL models are run using the R package [`dynamac`](https://cran.r-project.org/web/packages/dynamac/index.html). The function `regression_model(df, y, x, lags, diffs, ec, simulate)` uses the `dynamac` function `dynardl` to run the models. The function `regression_model(df, y, x, lags, diffs, ec, simulate)` takes the following arguments. 
+* `df`: The data frame.
+* `y`: The dependent variable.
+* `x`: The independent variables, specified as a column vector.
+* `lags`: The number of lags to be included for each variable. Specified as a list, e.g., `list("log_ncpi_adj" = 1, "log_m2" = 1`. The default value is zero lags for each variable, i.e., `lags = list()`.
+* `diffs`: The variables that need to be differenced. Only first differences are supported by `dynamac`. The variables to be differenced should determined based on model requirements and from the results of the stationarity tests: variables that are stationary in their first differences need to be differenced. `diffs` is specified as a vector, e.g., `c("log_er", "log_wr")`. The default is a NULL vector.
+* `ec`: Binary value indicating whether model should be estimated in error-correction form (i.e., `y` in first differences) or not. If `ec` is 1, then error correction is applied; if `ec` is 0, then it is not. The default value is 1.
+* `simulate`: Binary value (`TRUE` / `FALSE`) indicating whether response should be simulated or not. If not, only the regression model is estimated. Default is `FALSE`.
+
+The function `regression_model(...)` returns the estimated model. The models estimated and the parameters used are described in detail in Chapter 4, Section 4.4. of the [report](https://pranandita.github.io/files/Biswas_SriLanka_Inflation.pdf).  <br> 
+
+**Diagnostic tests** <br>
+
+The `dynamac` package provides pre-built functions to run diagnostic tests using dynamic model simulations. For this project, the Breusch–Pagan LM test and Shapiro–Wilk test for testing for no autocorrelation and normality of residuals, respectively, can be run using the `dynardl.auto.correlated` function. More on the function can be found in the [`dynamac` documentation](https://cran.r-project.org/web/packages/dynamac/dynamac.pdf). <br>
+
+The `dynamac` package does not provide the ability to run the White test for homomskedasticity, which is a crucial assumption for ARDL models. Hence, the function `white_test(df, x, model)` is written to run the White test. The arguments are as follows. 
+* `df`: The data frame.
+* `x`: The *independent* variables of the model, specified as a column vector.
+* `model`: The ARDL model estimated using `dynardl` (done here using the `regression_model` function).
+
+The function returns a data frame with the F-statistic and p-value of the White test. The White test functions by regressing the square of the model residuals on the independent variables `x` to check that there is no significant dependence of the residuals on the model parameters. Hence, the assumption is satisfied if the null hypothesis of the White test is *rejected*, i.e., if the p-value is greater than the desired level of significance. 
