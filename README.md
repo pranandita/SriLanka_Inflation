@@ -58,7 +58,8 @@ First, the function `time_series(df)` converts the data frames into `zoo` elemen
 Next, the function `stationarity_tests(ts_object)` takes a `zoo` element as the argument `ts_object` and performs stationarity tests on each time series on each column. The following tests are performed. 
 * Augmented Dickey–Fuller (ADF)
 * Phillips–Perron (PP)
-* Kwiatkowski–Phillips–Schmidt–Shin (KPSS) 
+* Kwiatkowski–Phillips–Schmidt–Shin (KPSS)
+
 For the ADF and PP tests, the null hypothesis is that the series is non-stationary. For the KPSS test, the null hypothesis is that the series is stationary. <br>
 
 The function `stationarity_tests(ts_object)` returns a data frame containing the f-statistics of the three tests for each time series in `ts_object`. The p-values are denoted through the star notation. Further, warnings are displayed, which are important for the **edge cases**: for p > 0.1, R reports a p-value of 0.1; for p < 0.01, R reports a p-value of 0.01. To account for these edge cases, the inequality conditions are adjusted accordingly in `stationarity_tests(ts_object)`. For these cases, R provides a warning message, e.g., for p > 0.1, it reports 'p-value greater than printed p-value'. The warning messages are stored in the results and the results should be re-checked individually in these cases before final reporting.
