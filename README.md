@@ -35,7 +35,8 @@ The R file named *Time_series_data.R* contains the code to conduct time-series a
 The function `ds_data(df, vars)` uses the loess filter for deseasonalizing data.
 It takes the following arguments. 
 * `df`: The data frame.
-* `vars`: The variables in `df` to be deseasonalized, specified as a column vector. 
+* `vars`: The variables in `df` to be deseasonalized, specified as a column vector.
+It returns the same data frame `df` with the deseasonalized data appended as new columns. <br>
 
 **2. Data transformations** <br>
 The following transformations are performed on all the data series.
@@ -44,11 +45,20 @@ The following transformations are performed on all the data series.
 * First difference of log transformation.
 
 The following variables are used. 
-`transform_data(df, vars)` and `transform_data_modified_log(df, vars)`. The `transform_data_modified_log(df, vars)` function is used for data series that contain zero and negative values, for which a regular log transformation is not possible, such as the inflation time series `inf` and `inf_adj`. The modified log transform takes the logarithm of the magnitude of the data point and assigns it the same sign as the data point. This is explained in Chapter 4 of the [report](https://pranandita.github.io/files/Biswas_SriLanka_Inflation.pdf).  <br> <br>
+`transform_data(df, vars)` and `transform_data_modified_log(df, vars)`. The `transform_data_modified_log(df, vars)` function is used for data series that contain zero and negative values, for which a regular log transformation is not possible, such as the inflation time series `inf` and `inf_adj`. The modified log transform takes the logarithm of the magnitude of the data point and assigns it the same sign as the data point. This is explained in Chapter 4 of the [report](https://pranandita.github.io/files/Biswas_SriLanka_Inflation.pdf).  <br> 
 
 Both functions take the following arguments. 
 * `df`: The data frame.
-* `vars`: The variables in `df` to be deseasonalized, specified as a column vector. 
+* `vars`: The variables in `df` to be deseasonalized, specified as a column vector.
+It returns the same data frame `df` with the transformed data appended as new columns.
 
 #### Stationarity tests
+First, the function `time_series(df)` converts the data frames into `zoo` elements, which can be used for running stationarity tests. The argument `df` is the data frame to be converted to a `zoo element`. <br>
 
+Next, the function `stationarity_tests(ts_object)` takes a `zoo` element as the argument `ts_object` and performs stationarity tests on each time series on each column. The following tests are performed. 
+* Augmented Dickey–Fuller (ADF)
+* Phillips–Perron (PP)
+* Kwiatkowski–Phillips–Schmidt–Shin (KPSS) 
+For the ADF and PP tests, the null hypothesis is that the series is non-stationary. For the KPSS test, the null hypothesis is that the series is stationary. <br>
+
+The function `stationarity_tests(ts_object)` returns a data frame containing the f-statistics of the three tests for each time series in `ts_object`. The p-values are denoted through the star notation. Further, warnings are displayed, which are important for the **edge cases**: for p > 0.1, R reports a p-value of 0.1; for p < 0.01, R reports a p-value of 0.01. To account for these edge cases, the inequality conditions are adjusted accordingly in `stationarity_tests(ts_object)`. For these cases, R provides a warning message, e.g., for p > 0.1, it reports 'p-value greater than printed p-value'. The warning messages are stored in the results and the results should be re-checked individually in these cases before final reporting.
