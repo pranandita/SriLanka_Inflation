@@ -7,7 +7,7 @@ This project aims to disentangle the root cause of high inflation during the Sri
 The data set *Time_series_data.xlsx* contains relevant macroeoconomic parameters used for evaluating the time-series ARDL models. The time series ranges from January 2014 to December 2023 except where mentioned. Some data series have shorter lengths due to data unavailability. The variables are explained as follows:
 
 * ***ncpi_21***: National Consumer Price Index (NCPI), reported with respect to base year 2021. Obviously, this data is reported only from 2022.
-* ***ncpi_21_adj***: NCPI (base 2021) adjusted to base year 2013 using the approximation described in Appendix 2 of the [report](https://pranandita.github.io/portfolio/1_Inflation/).
+* ***ncpi_21_adj***: NCPI (base 2021) adjusted to base year 2013 using the approximation described in Appendix 2 of the [report](https://pranandita.github.io/files/Biswas_SriLanka_Inflation.pdf).
 * ***ncpi***: Raw (unadjusted) NCPI values. From 2014 to 2022, the values are reported in base year 2013. As the Central Bank stopped reporting base-2013 values from 2023 onwards, the base-2021 value is used for the 2023. 
 * ***inf***: Monthly inflation calculated as the first difference of monthly values of raw NCPI ('ncpi').
 * ***ncpi_adj***: NCPI series adjusted to base year 2013. From 2014 to 2022, the data used are the base-2013 values reported by the Central Bank. For the 2023, the 'ncpi_21_adj' values are used.
@@ -30,5 +30,18 @@ Further, several the data set named *SriLanka_compiled_macro_data.xlsx* compiles
 The R file named *Time_series_data.R* contains the code to conduct time-series analysis on the data set *Time_series_anlaysis.xlsx*. 
 
 ### Code structure
+#### Data transformations
+**1. Deseasonalize NCPI** <br>
+The function `ds_data(df, vars)` uses the loess filter for deseasonalizing data.
+It takes the following arguments. 
+* `df`: The data frame.
+* `vars`: The variables in `df` to be deseasonalized, specified as a column vector. 
 
+**2. Data transformations**
+<p>The following transformations are performed on all the data series.</p>
+* First difference. 
+* Log transformation.
+* First difference of log transformation.
 
+The following variables are used. 
+`transform_data(df, vars)` and `transform_data_modified_log(df, vars)`. The `transform_data_modified_log(df, vars)` function is used for data series that contain zero and negative values, for which a regular log transformation is not possible. The modified log transform takes the logarithm of the magnitude of the data point and assigns it the same sign as the data point. This is explained in Chapter 4 of the [report](https://pranandita.github.io/files/Biswas_SriLanka_Inflation.pdf).  
