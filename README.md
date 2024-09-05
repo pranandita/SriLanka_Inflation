@@ -41,9 +41,9 @@ It returns the data frame `df` with the deseasonalized data appended as new colu
 
 **2. Data transformations** <br>
 The following transformations are performed on all the data series.
-* First difference. 
-* Log transformation.
-* First difference of log transformation.
+* First difference
+* Log transformation
+* First difference of log transformation
 
 The following functions are used: `transform_data(df, vars)` and `transform_data_modified_log(df, vars)`. The `transform_data_modified_log(df, vars)` function is used for data series that contain zero and negative values, such as the inflation time series `inf` and `inf_adj`, for which a regular log transformation is not possible. The modified log transform takes the logarithm of the magnitude of the data point and assigns it the same sign as the data point. This is explained in Chapter 4 of the [report](https://pranandita.github.io/files/Biswas_SriLanka_Inflation.pdf).  <br> 
 
