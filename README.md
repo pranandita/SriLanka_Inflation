@@ -36,7 +36,7 @@ The function `ds_data(df, vars)` uses the loess filter for deseasonalizing data.
 It takes the following arguments. 
 * `df`: The data frame.
 * `vars`: The variables in `df` to be deseasonalized, specified as a column vector.
-* 
+
 It returns the data frame `df` with the deseasonalized data appended as new columns. <br>
 
 **2. Data transformations** <br>
@@ -63,7 +63,7 @@ Next, the function `stationarity_tests(ts_object)` takes a `zoo` element as the 
 
 For the ADF and PP tests, the null hypothesis is that the series is non-stationary. For the KPSS test, the null hypothesis is that the series is stationary. <br>
 
-The function `stationarity_tests(ts_object)` returns a data frame containing the F-statistics of the three tests for each time series in `ts_object`. The p-values are denoted through the star notation. Further, warnings are displayed, which are important for the **edge cases**: for p > 0.1, R reports a p-value of 0.1; for p < 0.01, R reports a p-value of 0.01. To account for these, the inequality conditions are adjusted accordingly in `stationarity_tests(ts_object)`. In such cases, R provides a warning message, e.g., for p > 0.1, it reports 'p-value greater than printed p-value'. Whenever a warning message is displayed, the results of the stationarity tests should be re-checked individually before final reporting.
+The function `stationarity_tests(ts_object)` returns a data frame containing the F-statistics of the three tests for each time series in `ts_object`. The p-values are denoted through the star notation. Further, warnings are displayed, which are important for the **edge cases**: for $p>0.1$, R reports a p-value of $0.1$; for $p<0.01$, R reports a p-value of $0.01$. To account for these, the inequality conditions are adjusted accordingly in `stationarity_tests(ts_object)`. In such cases, R provides a warning message, e.g., for $p>0.1$, it reports 'p-value greater than printed p-value'. Whenever a warning message is displayed, the results of the stationarity tests should be re-checked individually before final reporting.
 
 #### ARDL models
 The ARDL models are run using the R package [`dynamac`](https://cran.r-project.org/web/packages/dynamac/index.html). The function `regression_model(df, y, x, lags, diffs, ec, simulate)` uses the `dynamac` function `dynardl` to run the models. The function `regression_model(df, y, x, lags, diffs, ec, simulate)` takes the following arguments. 
