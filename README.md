@@ -79,7 +79,7 @@ The function `regression_model(...)` returns the estimated model. The models run
 
 **Diagnostic tests** <br>
 
-The `dynamac` package provides built-in functions to run diagnostic tests using dynamic model simulations. For this project, the Breusch–Pagan LM test and Shapiro–Wilk test for checking for the assumptions of no autocorrelation and non-normality of residuals, respectively, were run using the `dynardl.auto.correlated` function. The [`dynamac` documentation](https://cran.r-project.org/web/packages/dynamac/dynamac.pdf) can be consulted to run the function. These two tests are not included in the code here for brevity as users can run them easily. <br>
+The `dynamac` package provides built-in functions to run diagnostic tests using dynamic model simulations. For this project, the Breusch–Pagan LM test and Shapiro–Wilk test for checking for the assumptions of no autocorrelation and non-normality of residuals, respectively, were run using the `dynardl.auto.correlated` function. The `dynamac` [documentation](https://cran.r-project.org/web/packages/dynamac/dynamac.pdf) can be consulted to run the function. These two tests are not included in the code here for brevity as users can run them easily. <br>
 
 The `dynamac` package does not provide the ability to run the White test for homomskedasticity, which is a crucial assumption for ARDL models. Hence, the function `white_test(df, x, model)` is written to run the White test. The arguments are as follows. 
 * `df`: The data frame.
