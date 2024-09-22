@@ -70,7 +70,7 @@ The ARDL models are run using the R package [`dynamac`](https://cran.r-project.o
 * `df`: The data frame.
 * `y`: The dependent variable.
 * `x`: The independent variables, specified as a column vector.
-* `lags`: The number of lags to be included for each variable. Specified as a list, e.g., `list("log_ncpi_adj" = 1, "log_m2" = 1`. The default value is zero lags for each variable, i.e., `lags = list()`.
+* `lags`: The number of lags to be included for each variable. Specified as a list, e.g., `list("log_ncpi_adj" = 1, "log_m2" = 1)`. The default value is zero lags for each variable, i.e., `lags = list()`.
 * `diffs`: The variables that need to be differenced. Only first differences are supported by `dynamac`. The variables to be differenced should be chosen based on model requirements and from the results of the stationarity tests: variables that are stationary in their first differences need to be differenced. `diffs` is specified as a vector, e.g., `c("log_er", "log_wr")`. The default value is a NULL vector, i.e., no variable is differenced.
 * `ec`: Binary value indicating whether model should be estimated in error-correction form (i.e., whether `y` should be included in first differences) or not. If `ec` is 1, then error correction is applied; if `ec` is 0, then it is not. The default value is 1.
 * `simulate`: Binary value (`TRUE` / `FALSE`) indicating whether response should be simulated or not. If `FALSE`, only the regression model is estimated. The default value assigned is `FALSE`.
