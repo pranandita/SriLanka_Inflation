@@ -1,9 +1,9 @@
 # Investigating the root of inflation in Sri Lanka–Money supply or exchange rate
 
-This project aims to disentangle the root cause of high inflation during the Sri Lankan financial crisis of 2022. Two theoretical models are proposed—a monetarist model and a post-Keynesian model—which blame monetary expansion and exchange rate dynamics, respectively, as the proximal cause of the inflationary spiral. The proposed models are then tested using autoregressive distributed lag (ARDL) econometric methodology with macroeoconomic monetary and fiscal data. A detailed report on the project can be found [here](https://pranandita.github.io/portfolio/1_Inflation/).
+This project aims to disentangle the root cause of high inflation during the Sri Lankan financial crisis of 2022. Two theoretical models are proposed—a monetarist model and a post-Keynesian model—which identify monetary expansion and exchange rate dynamics, respectively, as the proximal cause of the inflationary spiral. The proposed models are then tested using autoregressive distributed lag (ARDL) econometric methodology with macroeoconomic monetary and fiscal data. A detailed report on the project can be found [here](https://pranandita.github.io/portfolio/1_Inflation/).
 
 ## Data 
-### Time_series_data.lsx
+### Time_series_data.xlsx
 The data set *Time_series_data.xlsx* contains the relevant macroeoconomic parameters used for evaluating the time-series ARDL models. All time series range from January 2014 to December 2023 except where mentioned. Some data series have shorter lengths due to data unavailability. The time series variables are explained as follows.
 
 * **ncpi_21**: National Consumer Price Index (NCPI), reported with respect to base year 2021. Obviously, this data is reported only from 2022.
